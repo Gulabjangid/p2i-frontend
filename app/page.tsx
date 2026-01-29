@@ -1,789 +1,504 @@
-  // "use client";
+'use client';
 
-  // import { useState } from "react";
-
-  // export default function Home() {
-  //   const [prompt, setPrompt] = useState("");
-  //   const [imageUrl, setImageUrl] = useState("");
-  //   const [loading, setLoading] = useState(false);
-  //   const [error, setError] = useState("");
-  //   const [downloadLoading, setDownloadLoading] = useState(false);
-
-  //   const handleGenerate = async () => {
-  //     if (!prompt.trim()) {
-  //       setError("Please enter a prompt");
-  //       return;
-  //     }
-
-  //     setLoading(true);
-  //     setError("");
-  //     setImageUrl("");
-
-  //     try {
-  //       const response = await fetch("http://127.0.0.1:8000/generate-image", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({ prompt }),
-  //       });
-
-  //       if (!response.ok) {
-  //         throw new Error("Failed to generate image");
-  //       }
-
-  //       const data = await response.json();
-  //       setImageUrl(data.image_url);
-  //     } catch (err) {
-  //       setError("Something went wrong. Check backend.");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   const handleDownload = async () => {
-  //     if (!imageUrl) return;
-  //     setError("");
-  //     setDownloadLoading(true);
-  //     try {
-  //       const res = await fetch(imageUrl);
-  //       if (!res.ok) throw new Error("Failed to fetch image");
-  //       const blob = await res.blob();
-  //       const url = URL.createObjectURL(blob);
-  //       const a = document.createElement("a");
-  //       a.href = url;
-  //       // Try to infer extension from blob type
-  //       const ext = blob.type.split("/")[1] || "png";
-  //       a.download = `generated.${ext}`;
-  //       document.body.appendChild(a);
-  //       a.click();
-  //       a.remove();
-  //       URL.revokeObjectURL(url);
-  //     } catch (e) {
-  //       setError("Failed to download image");
-  //     } finally {
-  //       setDownloadLoading(false);
-  //     }
-  //   };
-
-  //   return (
-  //     <>
-  //       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black overflow-hidden">
-  //         {/* Background */}
-  //         <div className="fixed inset-0 opacity-20">
-  //           <div className="absolute inset-0 bg-grid-pattern"></div>
-  //           <div className="absolute inset-0 floating-particles"></div>
-  //         </div>
-
-  //         <main className="relative z-10 max-w-4xl mx-auto px-6 py-24">
-  //           {/* Header */}
-  //           <div className="text-center mb-8">
-  //             <div className="inline-flex items-center gap-3 mb-2 px-7 py-3 bg-gradient-to-r from-purple-600/20 to-blue-600/20 backdrop-blur-xl border border-white/10 rounded-2xl hover:scale-105 transition-all duration-300">
-  //               <div className="w-3 h-3 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full animate-pulse"></div>
-  //               <h1 className="text-3xl md:text-4xl font-semibold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-  //                 Think Prompt and Create
-  //               </h1>
-  //             </div>
-  //           </div>
-
-  //           {/* Input Section – immediately under heading */}
-  //           <div className="glass-card max-w-2xl mx-auto mb-6">
-  //             <div className="p-5 md:p-6">
-  //               <label className="block text-xs md:text-sm font-medium text-gray-300 mb-2 tracking-wide">
-  //                 Your Creative Vision
-  //               </label>
-  //               <div className="prompt-shell">
-  //                 <textarea
-  //                   className="prompt-textarea"
-  //                   placeholder="Describe the image you want to create... (e.g., 'A futuristic cityscape at sunset with flying cars and neon lights')"
-  //                   value={prompt}
-  //                   onChange={(e) => setPrompt(e.target.value)}
-  //                 />
-  //               </div>
-  //               {error && (
-  //                 <p className="mt-3 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300 text-xs md:text-sm">
-  //                   {error}
-  //                 </p>
-  //               )}
-  //             </div>
-  //           </div>
-
-  //           {/* Generate Button */}
-  //           <div className="text-center mt-12">
-  //             <button
-  //               className={`generate-btn group relative px-10 md:px-12 py-4 md:py-5
-  //                           text-base md:text-lg font-semibold rounded-2xl
-  //                           transition-all duration-500 transform hover:scale-105
-  //                           active:scale-95 ${
-  //                             loading
-  //                               ? "animate-pulse bg-gradient-to-r from-gray-700 to-gray-600 cursor-not-allowed"
-  //                               : "bg-gradient-to-r from-purple-600 via-blue-600 to-purple-700 hover:from-purple-700 hover:via-blue-700 hover:to-purple-800 shadow-2xl hover:shadow-purple-glow"
-  //                           }`}
-  //               onClick={handleGenerate}
-  //               disabled={loading}
-  //             >
-  //               <span className="absolute inset-0 bg-gradient-to-r from-purple-400 via-blue-400 to-purple-500 blur opacity-75 group-hover:opacity-100 transition-all duration-500"></span>
-  //               <span className="relative flex items-center gap-3 justify-center">
-  //                 {loading ? (
-  //                   <>
-  //                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-  //                     Generating...
-  //                   </>
-  //                 ) : (
-  //                   <>
-  //                     <svg
-  //                       className="w-5 h-5 md:w-6 md:h-6"
-  //                       fill="none"
-  //                       stroke="currentColor"
-  //                       viewBox="0 0 24 24"
-  //                     >
-  //                       <path
-  //                         strokeLinecap="round"
-  //                         strokeLinejoin="round"
-  //                         strokeWidth={2}
-  //                         d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-  //                       />
-  //                     </svg>
-  //                     Generate Image
-  //                   </>
-  //                 )}
-  //               </span>
-  //             </button>
-  //           </div>
-
-  //           {/* Generated Image */}
-  //           {imageUrl && (
-  //             <div className="glass-card max-w-2xl mx-auto mt-10  ">
-              
-  //                   <div className="relative group">
-  //                     <div className="absolute -inset-2 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-  //                     <img
-  //                       src={imageUrl}
-  //                       alt="Generated"
-  //                       className="w-full rounded-2xl shadow-2xl hover:scale-105 transition-transform duration-500"
-  //                     />
-  //                   </div>
-
-  //                   <div className="flex justify-center mt-6 gap-4">
-  //                     <button
-  //                       className={`inline-flex items-center gap-3 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300 text-white bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600 shadow-lg ${
-  //                         downloadLoading ? "opacity-60 cursor-not-allowed animate-pulse" : ""
-  //                       }`}
-  //                       onClick={handleDownload}
-  //                       disabled={downloadLoading}
-  //                     >
-  //                       {downloadLoading ? (
-  //                         <>
-  //                           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-  //                           Downloading...
-  //                         </>
-  //                       ) : (
-  //                         <>
-  //                           <svg
-  //                             xmlns="http://www.w3.org/2000/svg"
-  //                             className="h-4 w-4"
-  //                             fill="none"
-  //                             viewBox="0 0 24 24"
-  //                             stroke="currentColor"
-  //                             strokeWidth={2}
-  //                           >
-  //                             <path
-  //                               strokeLinecap="round"
-  //                               strokeLinejoin="round"
-  //                               d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"
-  //                             />
-  //                           </svg>
-  //                           Download
-  //                         </>
-  //                       )}
-  //                     </button>
-  //                   </div>
-  //             </div>
-  //           )}
-  //         </main>
-  //       </div>
-
-  //       {/* GLOBAL STYLES INLINE */}
-  //       <style jsx global>{`
-  //         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
-
-  //         * {
-  //           font-family: "Inter", -apple-system, BlinkMacSystemFont, system-ui,
-  //             sans-serif;
-  //         }
-
-  //         body {
-  //           margin: 0;
-  //           font-size: 15px;
-  //           line-height: 1.6;
-  //           color: #e5e7eb;
-  //           background: #000;
-  //         }
-
-  //         .glass-card {
-  //           background: rgba(255, 255, 255, 0.05);
-  //           backdrop-filter: blur(20px);
-  //           border: 1px solid rgba(255, 255, 255, 0.1);
-  //           border-radius: 24px;
-  //           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  //           transition: all 0.3s ease;
-  //         }
-
-  //         .glass-card:hover {
-  //           transform: translateY(-3px);
-  //           box-shadow: 0 35px 60px -16px rgba(0, 0, 0, 0.7);
-  //           border-color: rgba(255, 255, 255, 0.18);
-  //         }
-
-  //         .prompt-shell {
-  //           background: radial-gradient(
-  //               circle at top left,
-  //               rgba(255, 255, 255, 0.12),
-  //               transparent 55%
-  //             ),
-  //             radial-gradient(
-  //               circle at bottom right,
-  //               rgba(15, 23, 42, 0.9),
-  //               rgba(15, 23, 42, 1)
-  //             );
-  //           border-radius: 18px;
-  //           padding: 2px;
-  //           border: 1px solid rgba(148, 163, 184, 0.4);
-  //           box-shadow: 0 18px 35px rgba(0, 0, 0, 0.9),
-  //             inset 0 1px 0 rgba(255, 255, 255, 0.12),
-  //             inset 0 -1px 0 rgba(15, 23, 42, 0.9);
-  //         }
-
-  //         .prompt-textarea {
-  //           width: 100%;
-  //           height: 8.5rem;
-  //           border-radius: 16px;
-  //           background: radial-gradient(
-  //             circle at top left,
-  //             rgba(148, 163, 184, 0.18),
-  //             rgba(15, 23, 42, 0.95)
-  //           );
-  //           border: 0;
-  //           padding: 1.1rem 1.25rem;
-  //           font-size: 0.95rem;
-  //           color: #e5e7eb;
-  //           resize: none;
-  //           outline: none;
-  //           box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08),
-  //             inset 0 -1px 0 rgba(15, 23, 42, 0.9);
-  //           transition: box-shadow 0.2s ease, background 0.2s ease,
-  //             transform 0.15s ease;
-  //         }
-
-  //         .prompt-textarea::placeholder {
-  //           color: rgba(148, 163, 184, 0.85);
-  //         }
-
-  //         .prompt-textarea:focus {
-  //           background: radial-gradient(
-  //             circle at top left,
-  //             rgba(168, 85, 247, 0.22),
-  //             rgba(15, 23, 42, 0.98)
-  //           );
-  //           box-shadow: inset 0 0 0 1px rgba(168, 85, 247, 0.7),
-  //             0 0 0 1px rgba(15, 23, 42, 0.9),
-  //             0 18px 30px rgba(15, 23, 42, 0.9);
-  //           transform: translateY(-1px);
-  //         }
-
-  //         .generate-btn {
-  //           box-shadow: 0 20px 40px -12px rgba(147, 51, 234, 0.4),
-  //             0 0 0 1px rgba(255, 255, 255, 0.05),
-  //             inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  //         }
-
-  //         .generate-btn:hover {
-  //           box-shadow: 0 28px 55px -14px rgba(147, 51, 234, 0.7),
-  //             0 0 0 1px rgba(255, 255, 255, 0.18),
-  //             inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  //         }
-
-  //         .bg-grid-pattern {
-  //           background-image: linear-gradient(
-  //               rgba(255, 255, 255, 0.06) 1px,
-  //               transparent 1px
-  //             ),
-  //             linear-gradient(
-  //               90deg,
-  //               rgba(255, 255, 255, 0.06) 1px,
-  //               transparent 1px
-  //             );
-  //           background-size: 40px 40px;
-  //         }
-
-  //         .floating-particles::before,
-  //         .floating-particles::after {
-  //           content: "";
-  //           position: absolute;
-  //           width: 2px;
-  //           height: 2px;
-  //           border-radius: 9999px;
-  //         }
-
-  //         .floating-particles::before {
-  //           background: rgba(147, 51, 234, 0.6);
-  //           animation: float 22s infinite linear;
-  //         }
-
-  //         .floating-particles::after {
-  //           background: rgba(59, 130, 246, 0.6);
-  //           animation: float 30s infinite linear reverse;
-  //           left: 20%;
-  //         }
-
-  //         @keyframes float {
-  //           0% {
-  //             transform: translateY(110vh) rotate(0deg);
-  //             opacity: 0;
-  //           }
-  //           10% {
-  //             opacity: 1;
-  //           }
-  //           90% {
-  //             opacity: 1;
-  //           }
-  //           100% {
-  //             transform: translateY(-110vh) rotate(360deg);
-  //             opacity: 0;
-  //           }
-  //         }
-
-  //         @media (max-width: 768px) {
-  //           .prompt-textarea {
-  //             font-size: 0.9rem;
-  //           }
-  //         }
-  //       `}</style>
-  //     </>
-  //   );
-  // }
-  
-//   "use client";
-
-// import { useState } from "react";
-
-// export default function Home() {
-//   const [prompt, setPrompt] = useState("");
-//   const [provider, setProvider] = useState<"replicate" | "a4f">("replicate");
-//   const [imageUrl, setImageUrl] = useState("");
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState("");
-
-//   const handleGenerate = async () => {
-//     if (!prompt.trim()) {
-//       setError("Please enter a prompt");
-//       return;
-//     }
-
-//     setLoading(true);
-//     setError("");
-//     setImageUrl("");
-
-//     try {
-//       const response = await fetch("http://127.0.0.1:8000/generate-image", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({
-//           prompt,
-//           provider,          // 🔑 IMPORTANT
-//           aspect_ratio: "16:9",
-//         }),
-//       });
-
-//       if (!response.ok) {
-//         const err = await response.json();
-//         throw new Error(err.detail || "Backend error");
-//       }
-
-//       const data = await response.json();
-//       setImageUrl(data.image_url);
-//     } catch (err: any) {
-//       setError(err.message || "Something went wrong");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-black text-white flex flex-col items-center p-8">
-//       <h1 className="text-3xl font-bold mb-6">
-//         Image Generator (Replicate / A4F)
-//       </h1>
-
-//       {/* Provider Selector */}
-//       <div className="w-full max-w-xl mb-4">
-//         <label className="block mb-2 text-sm text-gray-300">
-//           Select Provider
-//         </label>
-//         <select
-//           value={provider}
-//           onChange={(e) =>
-//             setProvider(e.target.value as "replicate" | "a4f")
-//           }
-//           className="w-full p-3 rounded bg-gray-900 border border-gray-700 text-white"
-//         >
-//           <option value="replicate">Replicate (High Quality)</option>
-//           <option value="a4f">A4F (Fast)</option>
-//         </select>
-//       </div>
-
-//       {/* Prompt Input */}
-//       <textarea
-//         className="w-full max-w-xl p-4 rounded bg-gray-900 border border-gray-700 mb-4"
-//         placeholder="Describe the image you want..."
-//         value={prompt}
-//         onChange={(e) => setPrompt(e.target.value)}
-//       />
-
-//       {error && <p className="text-red-400 mb-4">{error}</p>}
-
-//       {/* Generate Button */}
-//       <button
-//         onClick={handleGenerate}
-//         disabled={loading}
-//         className="px-6 py-3 bg-purple-600 rounded hover:bg-purple-700 disabled:opacity-50"
-//       >
-//         {loading
-//           ? `Generating with ${provider}...`
-//           : "Generate Image"}
-//       </button>
-
-//       {/* Output Image */}
-//       {imageUrl && (
-//         <div className="mt-8 w-full max-w-xl">
-//           <img
-//             src={imageUrl}
-//             alt="Generated"
-//             className="w-full rounded-xl border border-gray-700"
-//           />
-//         </div>
-//       )}
-//     </div>
-//   );
-// }"
-"use client";
-
-import { useState } from "react";
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import Image from 'next/image';
+import { Sparkles, Zap, Palette, ChevronRight, Star, ArrowRight, CheckCircle, Mail, Search } from 'lucide-react';
+import Link from 'next/link';
 
 export default function Home() {
-  // --- STATE MANAGEMENT (Unchanged Functionality) ---
-  const [prompt, setPrompt] = useState("");
-  const [provider, setProvider] = useState<"replicate" | "a4f">("replicate");
-  const [imageUrl, setImageUrl] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [downloadLoading, setDownloadLoading] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [activePrompt, setActivePrompt] = useState(0);
+  const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
+  const [email, setEmail] = useState('');
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [dots, setDots] = useState<Array<{ left: string; top: string; animation: string; delay: string }>>([]);
 
-  // --- HANDLERS (Unchanged Functionality) ---
-  const handleGenerate = async () => {
-    if (!prompt.trim()) {
-      setError("Please enter a prompt");
-      return;
+  const prompts = [
+    {
+      text: "A serene mountain landscape at sunset with golden orange and purple clouds",
+      image: "/sample-1.jpg"
+    },
+    {
+      text: "A futuristic cyberpunk city at night with neon holographic billboards",
+      image: "/sample-2.jpg"
+    },
+    {
+      text: "An ethereal magical forest with bioluminescent glowing plants",
+      image: "/sample-3.jpg"
+    },
+    {
+      text: "A majestic dragon soaring through storm clouds with lightning",
+      image: "/sample-4.jpg"
     }
+  ];
 
-    setLoading(true);
-    setError("");
-    setImageUrl("");
+  useEffect(() => {
+    const generatedDots = [...Array(20)].map(() => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      animation: `float ${8 + Math.random() * 6}s ease-in-out infinite`,
+      delay: `${Math.random() * 2}s`
+    }));
+    setDots(generatedDots);
+  }, []);
 
-    try {
-      const response = await fetch("http://127.0.0.1:8000/generate-image", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt,
-          provider,
-          aspect_ratio: "16:9",
-        }),
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 30);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActivePrompt((prev) => (prev + 1) % prompts.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [prompts.length]);
+
+  const features = [
+    {
+      icon: Sparkles,
+      title: "Intelligent Generation",
+      description: "Advanced AI models that understand context and create stunning visuals from your imagination"
+    },
+    {
+      icon: Zap,
+      title: "Instant Results",
+      description: "Generate high-quality images in seconds, iterate rapidly on your creative vision"
+    },
+    {
+      icon: Palette,
+      title: "Boundless Styles",
+      description: "Photorealistic, abstract, fantasy, anime, and every art style imaginable at your fingertips"
+    }
+  ];
+
+  const benefits = [
+    { text: "No artistic skills required" },
+    { text: "Commercial-use rights included" },
+    { text: "Unlimited generations" },
+    { text: "Advanced editing tools" }
+  ];
+
+  const navLinks = [
+    { label: 'Home', href: '#home' },
+    { label: 'Features', href: '#features' },
+    { label: 'How it works', href: '#how-it-works' },
+    { label: 'Latest Creation', href: '#gallery' },
+    { label: 'About', href: '#' }
+  ];
+
+  const handleEmailSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email.trim()) {
+      setEmailSubmitted(true);
+      setEmail('');
+      setTimeout(() => setEmailSubmitted(false), 3000);
+    }
+  };
+
+  // Smooth scroll function
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const targetId = href.replace('#', '');
+    const element = document.getElementById(targetId);
+    
+    if (element) {
+      const navHeight = 80; // Adjust based on your nav height
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - navHeight;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
       });
-
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.detail || "Backend error");
-      }
-
-      const data = await response.json();
-      setImageUrl(data.image_url);
-    } catch (err: any) {
-      setError(err.message || "Something went wrong");
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleDownload = async () => {
-    if (!imageUrl) return;
-    setDownloadLoading(true);
-    try {
-      const res = await fetch(imageUrl);
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "generated-image.png";
-      a.click();
-      window.URL.revokeObjectURL(url);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setDownloadLoading(false);
-    }
-  };
-
-  // --- UI RENDER ---
   return (
-    <>
-      <div className="min-h-screen relative bg-[#050505] text-gray-200 overflow-x-hidden font-sans selection:bg-purple-500/30">
-        
-        {/* Background Atmosphere */}
-        <div className="fixed inset-0 z-0 pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#050505] to-[#000000]"></div>
-          <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-purple-900/20 rounded-full blur-[120px] mix-blend-screen animate-blob"></div>
-          <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-blue-900/10 rounded-full blur-[100px] mix-blend-screen animate-blob animation-delay-2000"></div>
-          <div className="absolute inset-0 bg-grid-white/[0.02] bg-[length:30px_30px]"></div>
-          <div className="particles-container">
-            <div className="particle"></div>
-            <div className="particle"></div>
-            <div className="particle"></div>
-          </div>
-        </div>
-
-        <main className="relative z-10 max-w-5xl mx-auto px-6 py-20 flex flex-col items-center min-h-screen justify-start">
-          
-          {/* 1. Header: Pill Shaped & Glowing */}
-          <div className="mb-16 animate-fade-in-down">
-            <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-[0_0_20px_rgba(124,58,237,0.1)] hover:shadow-[0_0_25px_rgba(124,58,237,0.2)] transition-all duration-500">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gradient-to-r from-purple-400 to-blue-400"></span>
-              </span>
-              <h1 className="text-lg font-medium tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
-                Think Prompt and Create
-              </h1>
-            </div>
-          </div>
-
-          <div className="w-full max-w-3xl flex flex-col gap-10">
-            
-            {/* 2. Provider Selection: Toggle Buttons */}
-            <div className="flex flex-col items-center gap-3 animate-fade-in-up delay-100">
-              <span className="text-xs uppercase tracking-[0.2em] text-gray-500 font-semibold">Select AI Provider</span>
-              <div className="flex p-1.5 bg-black/40 backdrop-blur-xl border border-white/10 rounded-full shadow-inner">
-                
-                {/* A4F Button */}
-                <button
-                  onClick={() => setProvider("a4f")}
-                  className={`relative px-8 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
-                    provider === "a4f"
-                      ? "text-white shadow-[0_0_20px_rgba(59,130,246,0.5)]"
-                      : "text-gray-500 hover:text-gray-300"
-                  }`}
-                >
-                  {provider === "a4f" && (
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 opacity-100"></div>
-                  )}
-                  <div className="relative z-10 flex items-center gap-2">
-                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                    A4F (Fast)
-                  </div>
-                </button>
-
-                {/* Replicate Button */}
-                <button
-                  onClick={() => setProvider("replicate")}
-                  className={`relative px-8 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
-                    provider === "replicate"
-                      ? "text-white shadow-[0_0_20px_rgba(147,51,234,0.5)]"
-                      : "text-gray-500 hover:text-gray-300"
-                  }`}
-                >
-                  {provider === "replicate" && (
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 opacity-100"></div>
-                  )}
-                  <div className="relative z-10 flex items-center gap-2">
-                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5L12 22l10-8.5-5-2.5-5 2.5z"/></svg>
-                    Replicate (High Quality)
-                  </div>
-                </button>
-              </div>
-            </div>
-
-            {/* 3. Prompt Input: Deep Glassmorphism */}
-            <div className="relative group animate-fade-in-up delay-200">
-              <label className="block text-xs uppercase tracking-wider text-gray-400 mb-3 ml-2 font-medium">
-                Your Creative Vision
-              </label>
-              <div className="relative rounded-3xl p-[1px] bg-gradient-to-b from-white/10 to-transparent focus-within:from-purple-500/50 focus-within:to-blue-500/50 transition-all duration-500">
-                <div className="bg-[#0c0c12]/80 backdrop-blur-2xl rounded-3xl overflow-hidden">
-                  <textarea
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="Describe the image you want to create… a cinematic futuristic city at sunset with neon lights"
-                    rows={4}
-                    className="w-full bg-transparent p-6 text-lg text-gray-200 placeholder-gray-600 focus:outline-none focus:ring-0 resize-none leading-relaxed transition-all shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]"
-                  />
-                  {/* Subtle decorative elements inside input */}
-                  <div className="absolute bottom-4 right-4 flex gap-2 pointer-events-none opacity-20">
-                    <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
-                    <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
-                  </div>
-                </div>
-              </div>
-              {error && (
-                <div className="mt-3 text-red-400 text-sm flex items-center gap-2 animate-shake">
-                  <span className="block w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                  {error}
-                </div>
-              )}
-            </div>
-
-            {/* 4. Action Button: Large Gradient Glow */}
-            <div className="flex justify-center animate-fade-in-up delay-300">
-              <button
-                onClick={handleGenerate}
-                disabled={loading}
-                className={`group relative w-full md:w-auto md:min-w-[280px] py-4 rounded-2xl font-semibold text-lg transition-all duration-500 ${
-                  loading
-                    ? "cursor-not-allowed opacity-80"
-                    : "hover:scale-[1.02] active:scale-[0.98]"
-                }`}
-              >
-                {/* Button Glow Background */}
-                <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 bg-[length:200%_auto] transition-all duration-500 blur opacity-40 group-hover:opacity-80 group-hover:blur-md ${loading ? 'animate-gradient-x' : ''}`}></div>
-                
-                {/* Button Face */}
-                <div className={`relative h-full px-8 flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-[#1a103c] to-[#101c3c] border border-white/10 group-hover:border-white/20 transition-all z-10 ${loading ? 'opacity-90' : ''}`}>
-                  {loading ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      <span className="bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text text-transparent">Generating...</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-5 h-5 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                      <span className="bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent group-hover:text-white">Generate Image</span>
-                    </>
-                  )}
-                </div>
-              </button>
-            </div>
-
-            {/* 5. Output Section: "Emerging" Card */}
-            {imageUrl && (
-              <div className="mt-8 animate-emerge perspective-1000">
-                <div className="glass-card p-2 rounded-[32px] bg-gradient-to-b from-white/10 to-white/5 border border-white/10 shadow-2xl transition-transform hover:scale-[1.01] duration-500 group">
-                  <div className="relative rounded-[28px] overflow-hidden bg-black aspect-video">
-                    <img
-                      src={imageUrl}
-                      alt="Generated Art"
-                      className="w-full h-full object-cover animate-fade-in"
-                    />
-                    
-                    {/* Hover Overlay with Download */}
-                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                      <button
-                        onClick={handleDownload}
-                        disabled={downloadLoading}
-                        className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md transition-all hover:scale-105"
-                      >
-                         {downloadLoading ? (
-                          <div className="w-4 h-4 border-2 border-white/50 border-t-white rounded-full animate-spin"></div>
-                        ) : (
-                          <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                          </svg>
-                        )}
-                        <span className="text-white font-medium">Download Asset</span>
-                      </button>
-                    </div>
-                  </div>
-                  
-                  {/* Subtle Glow under image */}
-                  <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-[40px] blur-2xl -z-10 opacity-50 group-hover:opacity-75 transition-opacity"></div>
-                </div>
-              </div>
-            )}
-
-          </div>
-        </main>
+    <div className="min-h-screen bg-background text-foreground overflow-hidden relative">
+      {/* Animated background dots */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {dots.map((dot, i) => (
+          <div
+            key={i}
+            className="floating-dot absolute w-1 h-1 bg-white rounded-full opacity-20"
+            style={{
+              left: dot.left,
+              top: dot.top,
+              animation: dot.animation,
+              animationDelay: dot.delay
+            }}
+          />
+        ))}
       </div>
 
-      {/* --- CSS EFFECTS --- */}
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+      {/* Navigation - Aligned with content */}
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled 
+          ? 'bg-[#1a1d24]/95 backdrop-blur-lg shadow-lg' 
+          : 'bg-[#1a1d24]'
+      }`}>
+        <div className="max-w-5xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between gap-8">
+            {/* Navigation Links - LEFT ALIGNED */}
+            <div className="flex items-center gap-1">
+              {navLinks.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={(e) => handleNavClick(e, link.href)}
+                  className="text-[15px] font-medium text-gray-300 hover:text-white transition-colors duration-200 px-5 py-2 rounded-md hover:bg-white/5 whitespace-nowrap cursor-pointer"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
 
-        body { font-family: 'Inter', sans-serif; }
+            {/* Right side - Login, Sign-up */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              {/* Login Button */}
+              <Button 
+                variant="ghost" 
+                className="text-white font-medium hover:bg-white/5 rounded-md px-6 h-10 text-[15px] border border-[#2a2d35] hover:border-gray-600 transition-all whitespace-nowrap"
+              >
+                Login
+              </Button>
 
-        /* Animation Keyframes */
-        @keyframes blob {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-          100% { transform: translate(0px, 0px) scale(1); }
+              {/* Sign-up Button */}
+              <Link href="/main">
+                <Button className="bg-[white] hover:bg-[purple] text-black font-semibold rounded-md px-6 h-10 text-[15px] transition-all duration-200 shadow-lg whitespace-nowrap">
+                  Sign-up
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section id="home" className="relative min-h-screen flex items-center justify-center pt-32 overflow-hidden">
+        {/* Gradient background - optimized */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/30 rounded-full blur-3xl opacity-40"></div>
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-accent/20 rounded-full blur-3xl opacity-30"></div>
+        </div>
+
+        <div className="relative z-10 max-w-5xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center w-full">
+          {/* Left side - Content */}
+          <div className="flex flex-col gap-8 fade-in-up">
+            <div className="inline-flex items-center gap-2 w-fit px-4 py-2 rounded-full bg-secondary/40 border border-primary/20 hover:border-primary/50 transition-colors duration-300">
+              <Star className="w-4 h-4 text-accent" />
+              <span className="text-sm font-medium text-secondary-foreground">Powered by latest AI models</span>
+            </div>
+
+            <div className="space-y-4">
+              <h1 className="text-5xl md:text-6xl font-bold leading-tight tracking-tight">
+                <span className="block mb-2">Create Stunning</span>
+                <span className="gradient-text text-5xl md:text-6xl font-bold">Images from Text</span>
+              </h1>
+              <p className="text-lg text-muted-foreground leading-relaxed max-w-md font-light">
+                Transform your imagination into reality. Generate unlimited unique artwork in seconds using cutting-edge artificial intelligence.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <Link href="/main">
+                <Button size="lg" className="bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:shadow-primary/40 text-white font-semibold rounded-full px-8 transition-all duration-300 transform hover:scale-105 active:scale-95 w-full sm:w-auto text-base">
+                  Start Creating
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <Button size="lg" variant="outline" className="border-primary/30 hover:border-primary/60 hover:bg-primary/10 text-foreground font-semibold rounded-full px-8 transition-all duration-300 transform hover:scale-105 active:scale-95 text-base">
+                View Demo
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-8 pt-8">
+              <div className="group cursor-pointer">
+                <p className="text-3xl font-bold group-hover:text-primary transition-colors duration-300">500K+</p>
+                <p className="text-sm text-muted-foreground font-light">Images Created</p>
+              </div>
+              <div className="group cursor-pointer">
+                <p className="text-3xl font-bold group-hover:text-primary transition-colors duration-300">50K+</p>
+                <p className="text-sm text-muted-foreground font-light">Active Creators</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right side - Image showcase */}
+          <div className="relative h-96 md:h-[500px] fade-in">
+            <div className="absolute inset-0 rounded-2xl overflow-hidden border border-primary/30 bg-card/50 backdrop-blur-sm p-4 group cursor-pointer hover:border-primary/60 transition-all duration-300 shadow-lg hover:shadow-primary/20">
+              <Image
+                src={prompts[activePrompt].image || "/placeholder.svg"}
+                alt="Generated AI image"
+                fill
+                className="object-cover rounded-xl group-hover:scale-105 transition-transform duration-500"
+                style={{ aspectRatio: '16/9' }}
+                priority
+              />
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-background via-transparent to-transparent opacity-40"></div>
+            </div>
+
+            {/* Image indicators */}
+            <div className="absolute bottom-8 left-8 right-8 flex gap-2 z-20">
+              {prompts.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActivePrompt(index)}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    index === activePrompt ? 'bg-primary w-8 shadow-lg shadow-primary/50' : 'bg-muted w-2 hover:bg-primary/60'
+                  }`}
+                  aria-label={`View prompt ${index + 1}`}
+                />
+              ))}
+            </div>
+
+            {/* Prompt text */}
+            <div className="absolute -bottom-24 left-0 right-0 text-center">
+              <p className="text-sm text-muted-foreground italic font-light">"{prompts[activePrompt].text}"</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="py-20 px-6 relative">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-6">
+            {benefits.map((benefit, index) => (
+              <div key={index} className="flex items-start gap-3 fade-in-up p-4 rounded-lg hover:bg-primary/5 transition-colors duration-300 border border-transparent hover:border-primary/20 group cursor-pointer" style={{ animationDelay: `${index * 100}ms` }}>
+                <CheckCircle className="w-5 h-5 text-accent flex-shrink-0 mt-0.5 group-hover:text-primary transition-colors duration-300" />
+                <span className="text-sm font-medium text-foreground">{benefit.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="py-24 px-6 relative scroll-mt-20">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-20">
+            <h2 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">
+              Powerful Features
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-light">
+              Everything you need to bring your creative vision to life
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <div
+                  key={index}
+                  onMouseEnter={() => setHoveredFeature(index)}
+                  onMouseLeave={() => setHoveredFeature(null)}
+                  className={`group p-8 rounded-xl border transition-all duration-300 cursor-pointer ${
+                    hoveredFeature === index
+                      ? 'border-primary/60 bg-primary/10 shadow-lg shadow-primary/20 transform scale-105'
+                      : 'border-primary/20 bg-card/30 hover:border-primary/40'
+                  }`}
+                >
+                  <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-primary/30">
+                    <Icon className="w-7 h-7 text-primary-foreground" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3 tracking-tight">{feature.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed font-light">{feature.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* How it works Section */}
+      <section id="how-it-works" className="py-24 px-6 relative scroll-mt-20">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-20">
+            <h2 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">
+              How It Works
+            </h2>
+            <p className="text-lg text-muted-foreground font-light">
+              Three simple steps to create amazing images
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-12">
+            {[
+              {
+                step: "01",
+                title: "Enter Your Prompt",
+                description: "Describe the image you want to create in your own words"
+              },
+              {
+                step: "02",
+                title: "AI Creates Magic",
+                description: "Our advanced models generate multiple variations instantly"
+              },
+              {
+                step: "03",
+                title: "Refine & Download",
+                description: "Upscale, edit, or generate more variations of your favorite"
+              }
+            ].map((item, index) => (
+              <div key={index} className="relative fade-in-up group" style={{ animationDelay: `${index * 150}ms` }}>
+                <div className="mb-6">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-primary/30">
+                    <span className="text-2xl font-bold text-primary-foreground tracking-tight">{item.step}</span>
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold mb-3 tracking-tight group-hover:text-primary transition-colors duration-300">{item.title}</h3>
+                <p className="text-muted-foreground leading-relaxed font-light">{item.description}</p>
+                {index < 2 && (
+                  <ChevronRight className="hidden md:block absolute -right-8 top-8 w-6 h-6 text-primary/40 group-hover:text-primary/70 transition-colors duration-300" />
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Interactive demo box */}
+          <div className="mt-20 p-8 rounded-xl border border-primary/30 bg-card/40 backdrop-blur-sm hover:border-primary/60 transition-all duration-300 shadow-lg hover:shadow-primary/20">
+            <div className="mb-6">
+              <label className="block text-base font-semibold mb-4 tracking-tight">Try it now:</label>
+              <div className="flex gap-3 flex-col sm:flex-row">
+                <input
+                  type="text"
+                  placeholder="Describe the image you want to create..."
+                  className="flex-1 px-4 py-3 rounded-lg bg-input border border-primary/20 focus:border-primary/60 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300 font-light"
+                  defaultValue="A serene waterfall in a misty forest"
+                />
+                <Button className="bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:shadow-primary/40 text-white font-medium rounded-lg transition-all duration-300">Generate</Button>
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground font-light">Your images are generated instantly and ready to use commercially.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery Section */}
+      <section id="gallery" className="py-24 px-6 scroll-mt-20">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-20">
+            <h2 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">Latest Creations</h2>
+            <p className="text-lg text-muted-foreground font-light">Inspiration from our community</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {prompts.map((prompt, index) => (
+              <div key={index} className="group relative h-72 rounded-xl overflow-hidden cursor-pointer border border-primary/20 hover:border-primary/60 fade-in-up hover:shadow-lg hover:shadow-primary/20 transition-all duration-300" style={{ animationDelay: `${index * 100}ms` }}>
+                <Image
+                  src={prompt.image || "/placeholder.svg"}
+                  alt={prompt.text}
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                  <p className="text-sm text-foreground line-clamp-2 font-light">{prompt.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24 px-6 relative overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 rounded-3xl"></div>
+        </div>
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight text-balance">
+            Ready to Start Creating?
+          </h2>
+          <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto font-light">
+            Join thousands of creators, designers, and artists using AI to bring their visions to life.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/main">
+              <Button size="lg" className="bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:shadow-primary/40 text-white font-semibold rounded-full px-8 transition-all duration-300 transform hover:scale-105 active:scale-95 w-full sm:w-auto text-base">
+                Get Started Free
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+            <Button size="lg" variant="outline" className="border-primary/30 hover:border-primary/60 hover:bg-primary/10 text-foreground font-semibold rounded-full px-8 transition-all duration-300 transform hover:scale-105 active:scale-95 text-base">
+              View Pricing
+            </Button>
+          </div>
+          <p className="text-sm text-muted-foreground mt-6 font-light">No credit card required. Start with 5 free generations.</p>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-primary/20 py-20 px-6 bg-background/50 backdrop-blur-sm">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-12 mb-12">
+            <div>
+              <h3 className="text-lg font-bold mb-4 tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">IMAGINE</h3>
+              <p className="text-sm text-muted-foreground font-light">Transform your imagination into stunning visuals with AI.</p>
+            </div>
+            <div>
+              <h4 className="text-base font-semibold mb-4 tracking-tight">Product</h4>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li><a href="#features" onClick={(e) => handleNavClick(e, '#features')} className="hover:text-primary transition-colors duration-300 font-light cursor-pointer">Features</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors duration-300 font-light">Pricing</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors duration-300 font-light">API</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-base font-semibold mb-4 tracking-tight">Company</h4>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li><a href="#home" onClick={(e) => handleNavClick(e, '#home')} className="hover:text-primary transition-colors duration-300 font-light cursor-pointer">About</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors duration-300 font-light">Blog</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors duration-300 font-light">Contact</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-base font-semibold mb-4 tracking-tight">Legal</h4>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-primary transition-colors duration-300 font-light">Privacy</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors duration-300 font-light">Terms</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors duration-300 font-light">License</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-primary/20 pt-8 flex flex-col md:flex-row items-center justify-between">
+            <p className="text-sm text-muted-foreground font-light">© 2025 Imagine. All rights reserved.</p>
+            <div className="flex gap-8 mt-6 md:mt-0">
+              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 font-light">Twitter</a>
+              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 font-light">Discord</a>
+              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 font-light">GitHub</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px) translateX(0px);
+            opacity: 0.2;
+          }
+          50% {
+            transform: translateY(-20px) translateX(10px);
+            opacity: 0.4;
+          }
         }
-        .animate-blob { animation: blob 10s infinite; }
-        .animation-delay-2000 { animation-delay: 2s; }
-
-        @keyframes fade-in-down {
-          0% { opacity: 0; transform: translateY(-20px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in-down { animation: fade-in-down 0.8s ease-out forwards; }
-
-        @keyframes fade-in-up {
-          0% { opacity: 0; transform: translateY(20px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in-up { animation: fade-in-up 0.8s ease-out forwards; opacity: 0; }
-        .delay-100 { animation-delay: 0.1s; }
-        .delay-200 { animation-delay: 0.2s; }
-        .delay-300 { animation-delay: 0.3s; }
-
-        @keyframes gradient-x {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        .animate-gradient-x { animation: gradient-x 3s ease infinite; }
-
-        @keyframes emerge {
-          0% { opacity: 0; transform: scale(0.95) translateY(20px); }
-          100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        .animate-emerge { animation: emerge 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-
-        /* Floating Particles */
-        .particles-container { position: absolute; inset: 0; overflow: hidden; }
-        .particle {
-          position: absolute;
-          width: 2px;
-          height: 2px;
-          background: rgba(255, 255, 255, 0.5);
-          border-radius: 50%;
-          animation: float-up 15s infinite linear;
-        }
-        .particle:nth-child(1) { left: 20%; animation-duration: 20s; opacity: 0.3; }
-        .particle:nth-child(2) { left: 70%; animation-duration: 25s; animation-delay: 2s; opacity: 0.2; }
-        .particle:nth-child(3) { left: 40%; animation-duration: 18s; animation-delay: 5s; opacity: 0.4; }
-
-        @keyframes float-up {
-          0% { transform: translateY(100vh); }
-          100% { transform: translateY(-10vh); }
+        
+        .floating-dot {
+          animation: float 6s ease-in-out infinite;
         }
 
-        /* Perspective for 3D tilts */
-        .perspective-1000 { perspective: 1000px; }
+        html {
+          scroll-behavior: smooth;
+        }
       `}</style>
-    </>
+    </div>
   );
 }
